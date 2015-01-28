@@ -1,6 +1,10 @@
 
+#
+# http://synergy2.sourceforge.net/configuration.html
+#
+
 section: screens
-	moe:
+	moe: # this is a screen
 	larry:
 		halfDuplexCapsLock = true
 		halfDuplexNumLock = true
@@ -11,6 +15,9 @@ end
 section: aliases
 	larry:
 		larry.stooges.com
+		
+		# empty lines should probably be ignored
+		
 		larry.stooges.io
 	curly:
 		shemp
@@ -30,6 +37,6 @@ end
 
 section: options
 	heartbeat = 5000
-	switchDelay = 500
-	switchCorners = all -top
+	switchDelay = 500 # half of a second
+	switchCorners = all -left +top-left
 end

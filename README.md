@@ -48,7 +48,10 @@ storing it in `config.meta.tab` and using that later if you stringify it.
 
 ## TODO
 
-* Ignore comments
+* :lock_with_ink_pen: Preserve comments???
+	I think someone needs to make a comprehensive system
+	for loading, modifying, and saving structured documents
+	while retaining as much metadata / formatting as possible.
 
 
 	∑SYN.Act =∑R-*I(CRed+COOP++AUnimit.)*V(Cust.+Info.)*cc

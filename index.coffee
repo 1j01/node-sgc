@@ -21,15 +21,29 @@ module.exports =
 	helpers: {heading}
 	
 	parse: (sgc)->
-		# TODO: ignore comments
-		# TODO: preserve comments???
 		config = screens: {}, links: {}, aliases: {}, options: {}
 		lines = sgc.split "\n"
-		lineno = 0
+		
 		# This loop is kind of clever in that it accesses a line in the
 		# 0-based array and then increments lineno to be 1-based
-		while (line = lines[lineno++])?
-			console.log "#{lineno} | #{line}" if inDebugMode()
+		lineno = 0
+		line = ""
+		nextLine = ->
+			line = lines[lineno++]
+			if line?
+				# strip comments
+				line = line.replace /#.*$/, ""
+				# empty line?
+				if line.match /^\s*$/
+					console.log "#{lineno} ...".grey() if inDebugMode()
+					nextLine() # skip this line; recurse
+				else
+					console.log "#{lineno} | #{line}" if inDebugMode()
+					yes # continue loop
+			else
+				no # end loop
+		
+		while nextLine()
 			
 			tab = (line.match /^\s+/)?[0]
 			config.meta ?= {tab} if tab
@@ -60,11 +74,7 @@ module.exports =
 				o
 			
 			parseBlock = (o, pattern, parseSubBlock)->
-				while (line = lines[lineno++])?
-					console.log "#{lineno} | #{line}" if inDebugMode()
-					
-					if line.match /^\s*$/
-						continue # aka don't continue, skip
+				while nextLine()
 					
 					if line is "end"
 						console.log "END OF SECTION; EXIT".red(), pattern.magenta(), "BLOCK".red() if inDebugMode()
@@ -81,7 +91,7 @@ module.exports =
 						parseSubBlock key
 					else
 						console.log "NO MATCH; EXIT".red(), pattern.magenta(), "BLOCK".red() if inDebugMode()
-						--lineno
+						--lineno # try this line again, as something else
 						break
 			
 			{section} = parse line, "section: SECTION"
