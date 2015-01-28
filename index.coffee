@@ -21,7 +21,13 @@ module.exports =
 	helpers: {heading}
 	
 	parse: (sgc)->
-		config = screens: {}, links: {}, aliases: {}, options: {}
+		config =
+			screens: {}
+			links: {}
+			aliases: {}
+			options: {}
+			meta: comments: []
+		
 		lines = sgc.split "\n"
 		
 		# This loop is kind of clever in that it accesses a line in the
@@ -31,8 +37,17 @@ module.exports =
 		nextLine = ->
 			line = lines[lineno++]
 			if line?
-				# strip comments
-				line = line.replace /#.*$/, ""
+				
+				# find and record first indent style
+				tab = (line.match /^\s+/)?[0]
+				config.meta.tab ?= tab if tab
+				
+				# strip (and record) comments
+				comment = (line.match /\s*#.*$/)?[0]
+				line = line.replace /\s*#.*$/, ""
+				if comment
+					config.meta.comments.push {comment, line, lineno}
+				
 				# empty line?
 				if line.match /^\s*$/
 					console.log "#{lineno} ...".grey() if inDebugMode()
@@ -44,9 +59,6 @@ module.exports =
 				no # end loop
 		
 		while nextLine()
-			
-			tab = (line.match /^\s+/)?[0]
-			config.meta ?= {tab} if tab
 			
 			parse = (str, pattern)->
 				captures = []
@@ -181,5 +193,11 @@ module.exports =
 		
 		stringifySection "options", (options)->
 			stringifyBlock options, "KEY = VALUE"
+		
+		# lines = sgc.split "\n"
+		# @TODO: match up comments with lines better?
+		if config.meta?.comments?
+			for comment in config.meta.comments
+				sgc = sgc.replace comment.line, comment.line + comment.comment+"\n"
 		
 		sgc

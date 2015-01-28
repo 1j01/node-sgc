@@ -41,17 +41,26 @@ fs.writeFileSync("synergy-config.sgc", SGC.stringify(config), {encoding: "utf8"}
 
 Both functions may throw errors.
 
-It tries to retain your preferred formatting,
-to the extent of storing the first indentation it finds,
-storing it in `config.meta.tab` and using that later if you stringify it.
+## Metadata Retention (:lock_with_ink_pen:)
+
+It tries to retain your preferred formatting a bit.
+It stores the first indentation it finds
+in `config.meta.tab` and uses that later if you stringify it.
+
+It also preserves some comments, sometimes in the wrong places.
+
+It can't be perfect. The file changes.
+
+After all, sometimes you *don't* want it to retain a comment,
+for example if you change the switch delay, this comment becomes outdated:
+
+	switchDelay = 500 # half of a second
 
 
-## TODO
-
-* :lock_with_ink_pen: Preserve comments???
-	I think someone needs to make a comprehensive system
-	for loading, modifying, and saving structured documents
-	while retaining as much metadata / formatting as possible.
+I think it would be awesome if someone started work on
+a comprehensive system for loading, modifying, and saving
+structured documents
+while retaining as much metadata and formatting as possible.
 
 
 	∑SYN.Act =∑R-*I(CRed+COOP++AUnimit.)*V(Cust.+Info.)*cc
