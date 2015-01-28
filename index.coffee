@@ -1,27 +1,35 @@
 
-#console = require 'log-colors' # TODO: remove
-#console = new (require 'log-color') "info" # TODO: remove
 try
 	require('simple-colors') # TODO: remove
 	util = require('util') # TODO: remove
 
-debug = log: ->
-	console.log arguments... if module.exports.debug
+inDebugMode = ->
+	module.exports.debug # or imports, rather
+
+heading = (title)->
+	dashes = ""
+	dashes += "-" for character in title
+	"""
+		
+		+-#{dashes}-+
+		| #{title } |
+		+-#{dashes}-+
+		
+	"""
 
 module.exports =
+	helpers: {heading}
 	
 	parse: (sgc)->
-		# TODO: ignore empty lines
 		# TODO: ignore comments
 		# TODO: preserve comments???
 		config = screens: {}, links: {}, aliases: {}, options: {}
 		lines = sgc.split "\n"
 		lineno = 0
-		# This loop might be clever in that it accesses a line in the
+		# This loop is kind of clever in that it accesses a line in the
 		# 0-based array and then increments lineno to be 1-based
-		#line = "<shared throughout scopes>" # TODO: can I remove this?
 		while (line = lines[lineno++])?
-			debug.log? "#{lineno} | #{line}"
+			console.log "#{lineno} | #{line}" if inDebugMode()
 			
 			tab = (line.match /^\s+/)?[0]
 			config.meta ?= {tab} if tab
@@ -45,29 +53,23 @@ module.exports =
 					.replace /\s+/g, "\\s*" 
 				regExp = new RegExp "^\\s*#{regExpPattern}\\s*$"
 				m = regExp.exec str
-				#console.log rgx, m
 				o = {}
 				for capture, i in captures
 					o[capture] = m?[i+1]
-				debug.log? "#{lineno} as".grey(), pattern.green(), "?".grey(), util.inspect(regExp).blue(), util.inspect(o).yellow()
+				console.log "#{lineno} as".grey(), pattern.green(), "?".grey(), util.inspect(regExp).blue(), util.inspect(o).yellow() if inDebugMode()
 				o
-				
-			#console.log parse "a=   b", "key = value"
 			
 			parseBlock = (o, pattern, parseSubBlock)->
-				#console.log "BEGIN #{pattern} BLOCK (line #{lineno})".magenta()
-				#console.log "BEGIN".blue(), pattern.magenta(), "BLOCK".blue()
 				while (line = lines[lineno++])?
-					#console.log "#{lineno} | #{line}".green()
-					debug.log? "#{lineno} | #{line}"
+					console.log "#{lineno} | #{line}" if inDebugMode()
 					
 					if line.match /^\s*$/
-						continue # skip
+						continue # aka don't continue, skip
 					
 					if line is "end"
-						debug.log? "END OF SECTION; EXIT".red(), pattern.magenta(), "BLOCK".red()
-						--lineno # reinterpret this in the parent block; break out of all blocks
-						break
+						console.log "END OF SECTION; EXIT".red(), pattern.magenta(), "BLOCK".red() if inDebugMode()
+						--lineno # reinterpret this "end" line in the parent block
+						break # break out of all blocks
 					
 					{key, value} = parse line, pattern
 					if value
@@ -76,19 +78,15 @@ module.exports =
 						else
 							o[key] = value
 					else if parseSubBlock
-						#console.log pattern, o, key, value, parseSubBlock
-						parseSubBlock key #o[key] = {}
+						parseSubBlock key
 					else
-						#console.log "NO MATCH; EXIT".red(), pattern.green(), "BLOCK (line #{lineno})".red()
-						#console.log "NO MATCH; EXIT #{pattern} BLOCK (line #{lineno})".red()
-						#console.log "NO MATCH; EXIT".red(), pattern.magenta(), "BLOCK (line #{lineno})".red()
-						debug.log? "NO MATCH; EXIT".red(), pattern.magenta(), "BLOCK".red()
+						console.log "NO MATCH; EXIT".red(), pattern.magenta(), "BLOCK".red() if inDebugMode()
 						--lineno
 						break
 			
 			{section} = parse line, "section: SECTION"
 			if section
-				module.exports.debug?.heading "PARSE #{section.toUpperCase()} SECTION"
+				console.log heading "PARSE #{section.toUpperCase()} SECTION" if inDebugMode()
 				switch section
 					when "options"
 						# Options are simply a list of KEY = VALUE pairs
@@ -96,6 +94,7 @@ module.exports =
 					when "screens", "aliases", "links"
 						# These sections are all keyed with screen names
 						parseBlock config[section], "KEY:", (screenName)->
+							# with sub-blocks
 							switch section
 								when "screens"
 									parseBlock (config[section][screenName] = {}), "KEY = VALUE"
@@ -162,13 +161,13 @@ module.exports =
 			stringifyBlock screens, "KEY:", (o)->
 				stringifyBlock o, "KEY = VALUE"
 		
-		stringifySection "links", (links)->
-			stringifyBlock links, "KEY:", (o)->
-				stringifyBlock o, "KEY = VALUE"
-		
 		stringifySection "aliases", (aliases)->
 			stringifyBlock aliases, "KEY:", (o)->
 				stringifyBlock o, "VALUE"
+		
+		stringifySection "links", (links)->
+			stringifyBlock links, "KEY:", (o)->
+				stringifyBlock o, "KEY = VALUE"
 		
 		stringifySection "options", (options)->
 			stringifyBlock options, "KEY = VALUE"
