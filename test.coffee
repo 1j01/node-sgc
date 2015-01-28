@@ -1,5 +1,5 @@
 
-SGC = require './index'
+SGC = require './'
 fs = require 'fs'
 
 {heading} = SGC.helpers
