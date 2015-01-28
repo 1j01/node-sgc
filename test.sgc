@@ -1,0 +1,35 @@
+
+section: screens
+		moe:
+		larry:
+				halfDuplexCapsLock = true
+				halfDuplexNumLock = true
+		curly:
+				meta = alt
+end
+
+section: aliases
+		larry:
+				larry.stooges.com
+				larry.stooges.io
+		curly:
+				shemp
+end
+
+section: links
+		moe:
+				right        = larry
+				up(50,100)   = curly(0,50)
+		larry:
+				left         = moe
+				up(0,50)     = curly(50,100)
+		curly:
+				down(0,50)   = moe
+				down(50,100) = larry(0,50)
+end
+
+section: options
+		heartbeat = 5000
+		switchDelay = 500
+		switchCorners = all -top
+end

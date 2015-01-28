@@ -1,0 +1,20 @@
+{
+  "name": "sgc",
+  "description": "Synergy configuration file parser",
+  "tags": [
+    "synergy",
+    "config",
+    "configuration",
+    "file",
+    "parser",
+    "read",
+    "write"
+  ],
+  "devDependencies": {
+    "coffee-script": "^1.8.0",
+    "simple-colors": "^0.1.0"
+  },
+  "scripts": {
+    "test": "coffee test.coffee"
+  }
+}
