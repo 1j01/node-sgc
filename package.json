@@ -1,7 +1,16 @@
 {
   "name": "sgc",
   "description": "Synergy configuration file parser",
-  "tags": [
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/1j01/node-sgc.git"
+  },
+  "bugs": {
+    "url": "http://github.com/1j01/node-sgc/issues"
+  },
+  "license": "MIT",
+  "keywords": [
     "synergy",
     "config",
     "configuration",
@@ -14,7 +23,9 @@
     "coffee-script": "^1.8.0",
     "simple-colors": "^0.1.0"
   },
+  "main": "lib/index.js",
   "scripts": {
-    "test": "coffee test.coffee"
+    "test": "coffee test.coffee",
+    "prepublish": "coffee -o lib -c index.coffee"
   }
 }
